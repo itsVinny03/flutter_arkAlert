@@ -15,7 +15,6 @@ import 'package:mime/mime.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:unique_identifier/unique_identifier.dart';
-import 'barcode_scanner_screen.dart';
 
 class SoftwareWebViewScreen extends StatefulWidget {
   final int linkID;
@@ -598,30 +597,6 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
       }
     });
   }
-  Future<void> _openBarcodeScanner() async {
-    try {
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const BarcodeScannerScreen(),
-        ),
-      );
-
-      if (result != null && result is String && result.isNotEmpty) {
-        // Inject the scanned code into the focused input field
-        await _injectBarcodeIntoWebView(result);
-      }
-    } catch (e) {
-      print('Error opening barcode scanner: $e');
-      Fluttertoast.showToast(
-        msg: _currentLanguageFlag == 2
-            ? "バーコードスキャナーを開けませんでした"
-            : "Could not open barcode scanner",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
-  }
 
   Future<void> _injectBarcodeIntoWebView(String barcode) async {
     if (webViewController != null) {
@@ -727,82 +702,12 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
     const topElem = document.elementFromPoint(centerX, centerY);
     return topElem === elem || elem.contains(topElem);
   }
-
-  function updateBarcodeScannerButton() {
-    const input = document.getElementById('itemInput');
-    if (!input) return;
-
-    const shouldShow = isVisible(input);
-
-    // If it should be visible and not already added
-    if (shouldShow && !input.dataset.hasBarcodeButton) {
-      input.dataset.hasBarcodeButton = 'true';
-
-      container = document.createElement('div');
-      container.style.position = 'relative';
-      container.style.display = 'inline-block';
-      container.style.width = '100%';
-
-      input.parentNode.insertBefore(container, input);
-      container.appendChild(input);
-
-      button = document.createElement('div');
-      button.innerHTML = '𝄃𝄂𝄂𝄀𝄁𝄃';
-      button.style.cssText = \`
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 9999;
-        background: #3452B4;
-        color: white;
-        padding: 0 4px;
-        border-radius: 4px;
-        font-size: 10px;
-        cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        font-family: Arial, sans-serif;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      \`;
-
-      button.onclick = function(e) {
-        e.stopPropagation();
-        window.flutter_inappwebview.callHandler('openBarcodeScanner');
-      };
-
-      container.appendChild(button);
-    }
-
-    // If the input is now hidden or behind modal, remove the button
-    if (!shouldShow && button && container && container.parentNode) {
-      input.removeAttribute('data-has-barcode-button');
-      container.parentNode.insertBefore(input, container);
-      container.remove();
-      button = null;
-      container = null;
-    }
-  }
-
-  // Initial check
-  updateBarcodeScannerButton();
-
-  // Observe DOM for changes (e.g., modal open/close)
-  const observer = new MutationObserver(function() {
-    updateBarcodeScannerButton();
-  });
-
   observer.observe(document.body, {
     childList: true,
     subtree: true,
     attributes: true,
     attributeFilter: ['style', 'class']
   });
-
-  // Also check every second in case changes aren't caught by observer
-  setInterval(updateBarcodeScannerButton, 1000);
 })();
 ''';
 
@@ -1363,14 +1268,6 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) {
                     webViewController = controller;
-
-                    // Add handler for barcode scanner
-                    controller.addJavaScriptHandler(
-                      handlerName: 'openBarcodeScanner',
-                      callback: (args) {
-                        _openBarcodeScanner();
-                      },
-                    );
                   },
                   onLoadStart: (controller, url) {
                     setState(() {
