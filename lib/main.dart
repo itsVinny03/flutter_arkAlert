@@ -59,8 +59,8 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
       routes: {
         '/phorjapan': (context) => PhOrJpScreen(),
-        '/webView': (context) => SoftwareWebViewScreen(linkID: 22),
-        '/webViewJP': (context) => SoftwareWebViewScreenJP(linkID: 22),
+        '/webView': (context) => SoftwareWebViewScreen(linkID: 23),
+        '/webViewJP': (context) => SoftwareWebViewScreenJP(linkID: 23),
       },
     );
   }

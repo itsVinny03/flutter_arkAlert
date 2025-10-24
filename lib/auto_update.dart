@@ -18,8 +18,8 @@ class AutoUpdate {
     "http://220.157.175.232/",
   ];
 
-  static const String versionPath = "V4/Others/Kurt/LatestVersionAPK/OvenItemMonitoring/version.json";
-  static const String apkPathPrefix = "V4/Others/Kurt/LatestVersionAPK/OvenItemMonitoring/";
+  static const String versionPath = "V4/Others/Kurt/LatestVersionAPK/ArkAlert/version.json";
+  static const String apkPathPrefix = "V4/Others/Kurt/LatestVersionAPK/ArkAlert/";
 
   static const Duration requestTimeout = Duration(seconds: 3);
   static const int maxRetries = 3;
